@@ -21,20 +21,16 @@ const MainStackNav = () => {
     // }, []);
 
     return (
-        <AnimatedSplash
-            translucent={true}
-            isLoaded={loading}
-            logoImage={logo}
-            backgroundColor={"#fff"}
-            logoHeight={sw * 50 / 100}
-            logoWidth={sw * 50 / 100}
-        >
-            {/* { user ? */}
+        // <AnimatedSplash
+        //     translucent={true}
+        //     isLoaded={false}
+        //     logoImage={logo}
+        //     backgroundColor={"#fff"}
+        //     logoHeight={sw * 50 / 100}
+        //     logoWidth={sw * 50 / 100}
+        // >
             <AppStackNav />
-            {/* :
-                <AuthStackNav /> */}
-            {/* } */}
-        </AnimatedSplash>
+        // </AnimatedSplash>
     )
 
 }

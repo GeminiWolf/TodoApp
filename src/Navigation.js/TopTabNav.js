@@ -11,10 +11,10 @@ const TopTabNav = () => {
     return (
         <TopTab.Navigator
             tabBarOptions={{
-                tabStyle: {
-                    backgroundColor: color2
-                },
-                activeTintColor: color1,
+                // tabStyle: {
+                //     backgroundColor: color2
+                // },
+                // activeTintColor: color1,
                 inactiveTintColor: '#adadad'
             }}
         >

@@ -2,10 +2,9 @@ import React, { useContext, useState } from 'react';
 import { Dimensions, FlatList, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { AuthContext } from '../Providers/AuthProvider';
-import Swipeable from 'react-native-swipeable-br';
-import moment from 'moment';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { color1, color2 } from '../Styles/StyleValues';
+import { getDate } from '../Components/Dates';
 
 const sw = Dimensions.get('window').width
 
@@ -16,7 +15,8 @@ const NotesScreen = ({ navigation }) => {
 
     const deleteNote = async (i) => {
         try {
-            const storedItems = JSON.parse(await AsyncStorage.getItem('Notes'));
+            const getItemDel = await AsyncStorage.getItem('Notes')
+            const storedItems = await JSON.parse(getItemDel);
             const itemsArray = storedItems || [];
 
             itemsArray.splice(i, 1)
@@ -36,9 +36,9 @@ const NotesScreen = ({ navigation }) => {
     }
 
     return (
-        <View style={{ flex: 1, paddingHorizontal: 20, backgroundColor: color1 }} >
+        <View style={{ flex: 1, paddingHorizontal: 20 }} >
             <StatusBar barStyle='dark-content' />
-            <Text style={{ fontSize: 30, marginVertical: 20, color: color2 }}>Notes</Text>
+            <Text style={{ fontSize: 30, marginVertical: 20, color: '#000' }}>Notes</Text>
             <FlatList
                 data={notes}
                 keyExtractor={note => note.id}
@@ -48,12 +48,12 @@ const NotesScreen = ({ navigation }) => {
                         <Card.FeaturedSubtitle style={{ color: 'grey', width: '90%' }} numberOfLines={1}>
                             <Text>{item.note}</Text>
                         </Card.FeaturedSubtitle>
-                        <Text style={{ fontSize: 12 }}>Created: {moment(item.createdAt).format('ddd, DD MMM YY')}</Text>
-                        <Icon onPress={() => navigation.navigate('New Note', { note: item })} name='pen' type='font-awesome-5' size={18} containerStyle={{ position: 'absolute', top: 5, right: 5 }} />
+                        <Text style={{ fontSize: 12 }}>Created: {getDate(item.createdAt)}</Text>
+                        <Icon onPress={() => navigation.navigate('New Note', { note: item, use: 'edit' })} name='pen' type='font-awesome-5' size={18} containerStyle={{ position: 'absolute', top: 5, right: 5 }} />
                         <Icon onPress={() => deleteNote(index)} name='trash' type='font-awesome-5' size={18} containerStyle={{ position: 'absolute', bottom: 5, right: 5 }} />
                     </Card>
                 )} />
-            <Icon containerStyle={{ paddingBottom: 20 }} onPress={() => navigation.navigate('New Note')} name='add' color={color2} type='ionicons' size={50} />
+            <Icon containerStyle={{ paddingBottom: 20 }} onPress={() => navigation.navigate('New Note', {use: 'add'})} name='add' type='ionicons' size={50} />
         </View>
     );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { Button, Icon, Input, Overlay } from 'react-native-elements';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -10,17 +10,22 @@ const TaskModal = ({ visible, addTask, setVisible }) => {
     const [show, setShow] = useState(false);
     const [dateTask, setDateTask] = useState(new Date());
 
+    useEffect(() => {
+        return setDateTask(new Date)
+    }, [])
+
     const setDateTime = (event, selectedDate) => {
         const currentDate = selectedDate || dateTask;
         console.log(event)
+        setDateTask(new Date(event.nativeEvent.timestamp));
         setShow(false)
         // setShow(Platform.OS === 'ios');
-        setDateTask(new Date(event.nativeEvent.timestamp));
     }
 
     return (
         <Overlay
             isVisible={visible}
+            onBackdropPress={() => setVisible(false)}
         >
             <View
                 style={{

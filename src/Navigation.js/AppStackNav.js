@@ -18,19 +18,14 @@ const AppStackNav = () => {
             <AppStack.Screen
                 name='WolfTodos'
                 component={TopTabNav}
-                options={{
-                    headerTitleStyle: {
-                        color: color1
-                    },
-                    headerStyle: {
-                        backgroundColor: color2,
-                    },
-                    headerRight: () => <RightIcons />
-                }}
+                // options={{
+                    // headerTitleStyle: {
+                    //     color: color1
+                    // },
+                    // headerRight: () => <RightIcons />
+                // }}
             />
             <AppStack.Screen name='New Note' component={AddNoteScreen} />
-            <AppStack.Screen name='Log in' component={LoginScreen} options={{ headerShown: false }} />
-            <AppStack.Screen name='Register' component={RegisterScreen} options={{ headerShown: false }} />
             <AppStack.Screen name='Settings' component={SettingScreen} />
         </AppStack.Navigator>
     );

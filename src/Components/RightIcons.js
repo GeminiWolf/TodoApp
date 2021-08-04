@@ -10,7 +10,7 @@ const RightIcons = () => {
 
     return (
         <View style={{ marginRight: 20 }} >
-            <Icon onPress={() => navigation.navigate('Settings')} name='cog' type='font-awesome-5' color={color1}></Icon>
+            <Icon onPress={() => navigation.navigate('Settings')} name='cog' type='font-awesome-5' ></Icon>
         </View>
     );
 }

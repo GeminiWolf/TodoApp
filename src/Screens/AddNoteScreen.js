@@ -3,8 +3,8 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, Divider } from 'react-native-elements';
 import { User, Object, Query } from "parse/react-native.js";
 import { AuthContext } from '../Providers/AuthProvider';
-import AsyncStorage from '@react-native-community/async-storage';
-import { guidGenerator } from '../Components/KeyGen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { guidGenerator } from '../Utils/KeyGen';
 import { color1, color2 } from '../Styles/StyleValues';
 
 AsyncStorage
@@ -18,7 +18,7 @@ const AddNoteScreen = ({ navigation, route }) => {
     const { notes, fetchNotes, loadItems } = useContext(AuthContext)
 
     useEffect(() => {
-        if (route.params !== undefined) {
+        if (route.params.use == 'edit') {
             setTitle(route.params.note.title)
             setNote(route.params.note.note)
             setUpdateNote(true)
@@ -33,7 +33,8 @@ const AddNoteScreen = ({ navigation, route }) => {
             const newNote = { id: genId, title: title, note: note, createdAt: Date.now() };
 
             try {
-                const storedItems = JSON.parse(await AsyncStorage.getItem('Notes'));
+                const getItemAdd = await AsyncStorage.getItem('Notes');
+                const storedItems = await JSON.parse(getItemAdd);
                 const itemsArray = storedItems || [];
                 await AsyncStorage.setItem(
                     'Notes',
@@ -54,33 +55,37 @@ const AddNoteScreen = ({ navigation, route }) => {
         }
     }
 
-    const update = () => {
-        const AddNote = Object.extend('Notes')
-        const addNote = new Query(AddNote)
+    const update = async () => {
+        const idPassed = route.params.note.id;
 
-        addNote.get(route.params.note.objectId)
-            .then(obj => {
-                obj.set('title', title)
-                obj.set('note', note)
-                obj.save()
-                    .then(res => {
-                        fetchNotes()
-                        alert('Updated!')
-                    })
-                    .catch(err => {
-                        alert(err)
-                    })
-            })
-            .catch(err => {
-                alert(err)
-            })
+        try {            
+            const getItems = await AsyncStorage.getItem('Notes')
+            const storedItems = await JSON.parse(getItems);
+            const itemsArray = storedItems || [];
+            
+            const el = await itemsArray.findIndex(({id}) => id === idPassed)
+            console.log(new Date(), el)
+            itemsArray[el].title = title 
+            itemsArray[el].note = note 
 
+            await AsyncStorage.setItem(
+                'Notes',
+                JSON.stringify([...itemsArray])
+            ).catch((err) => {
+                console.log(err);
+            });
+
+            loadItems()
+        }
+        catch (err) {
+            console.log('Err ', err)
+        }
 
         navigation.goBack()
     }
 
     return (
-        <View style={{ flex: 1, margin: 20, backgroundColor: color1 }}>
+        <View style={{ flex: 1, margin: 20, }}>
             <Text style={styles.textTitles}>Title</Text>
             <Divider />
             <TextInput
@@ -102,9 +107,9 @@ const AddNoteScreen = ({ navigation, route }) => {
             />
             {
                 updateNote ?
-                    <Button onPress={() => update()} title='Update' type='solid' />
+                    <Button onPress={() => update()} title='Update' type='outline' />
                     :
-                    <Button onPress={() => add()} title='Add' type='solid' />
+                    <Button onPress={() => add()} title='Add' type='outline' buttonStyle={{ borderColor: '#000' }} titleStyle={{ color: '#000' }} />
             }
         </View>
     );
@@ -113,7 +118,7 @@ const AddNoteScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     textTitles: {
         fontSize: 20,
-        color: color2
+        color: '#000'
     }
 })
 
