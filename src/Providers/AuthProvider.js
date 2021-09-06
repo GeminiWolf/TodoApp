@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { User } from "parse/react-native.js";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import localStorage from 'react-native-sync-localstorage';
 
 export const AuthContext = createContext()
 
@@ -10,26 +10,35 @@ const AuthProvider = ({ children }) => {
     const [Error, setError] = useState(null)
     const [tasks, setTasks] = useState(null)
     const [notes, setNotes] = useState(null)
+    const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(false)
     const [loadingBtn, setLoadingBtn] = useState(false)
 
     
-    const loadItems = async () => {
-        try {
-            const getTasks = await AsyncStorage.getItem('Tasks')
+    const loadItems = () => {
+        load()
+        
+        setLoading(false)
+    }
+
+    const load = async () => {
+        try{
+            const getTasks = await localStorage.getItem('Tasks')            
             const parsedTasks = getTasks != null ? await JSON.parse(getTasks) : []
             setTasks(parsedTasks)
-
-            const getNotes = await AsyncStorage.getItem('Notes')
+            
+            const getNotes = await localStorage.getItem('Notes')
             const parsedNotes = getNotes != null ? await JSON.parse(getNotes) : []
             setNotes(parsedNotes)
 
+            const getCat = await localStorage.getItem('Categories')
+            const parsedCat = getNotes != null ? await JSON.parse(getCat) : []
+            setCategories(parsedCat)
+
         }
         catch (err) {
-            console.log('Application Error. Cannot load data.')
+            console.log('Application Error. Cannot load Tasks.')
         }
-        
-        setLoading(false)
     }
     
     useEffect(() => {
@@ -70,6 +79,23 @@ const AuthProvider = ({ children }) => {
             });
     };
 
+    const fetchCategories = async () => {
+        await fetch('https://parseapi.back4app.com/classes/Notes', {
+            headers: {
+                'X-Parse-Application-Id': 'wDsXtlHJ1rKibv1G5kx9y47oClXnrVsVxjnhA0w8',
+                'X-Parse-REST-API-Key': 'OJQOK7dNzJgmEb3lqfFVrrsI2HRqCr6XtMSMoAO9',
+                'content-type': 'application/json',
+            }
+        })
+            .then((response) => response.json())
+            .then(({ results }) => {
+                setNotes(results.filter(fil))
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
     function fil(h) {
         if (User.current()?.id) {
             return h.user === User.current().id
@@ -88,9 +114,13 @@ const AuthProvider = ({ children }) => {
                 loading,
                 setLoading,
                 loadingBtn,
+                categories,
                 loadItems,
+                load,
                 fetchTasks,
                 fetchNotes,
+                fetchCategories,
+                
                 Login: () => {
                     setLoadingBtn(true)
                     User.currentAsync()

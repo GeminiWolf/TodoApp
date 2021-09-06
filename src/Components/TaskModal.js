@@ -1,23 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { Button, Icon, Input, Overlay } from 'react-native-elements';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { color1, color2 } from '../Styles/StyleValues';
+import { addTask } from '../Utils/TaskActions';
 
-const TaskModal = ({ visible, addTask, setVisible }) => {
+const TaskModal = ({ visible, setVisible, load, switchFilter, selectedFilter }) => {
 
     const [inputTask, setInputTask] = useState('');
     const [show, setShow] = useState(false);
-    const [dateTask, setDateTask] = useState(new Date());
+    const [date, setDate] = useState(new Date());
+    const [dateTask, setDateTask] = useState(date.getMilliseconds());
 
     useEffect(() => {
-        return setDateTask(new Date)
+        return () => setDateTask(date.getMilliseconds())
     }, [])
 
-    const setDateTime = (event, selectedDate) => {
-        const currentDate = selectedDate || dateTask;
-        console.log(event)
-        setDateTask(new Date(event.nativeEvent.timestamp));
+    const addProcess = async () => {
+        await addTask(inputTask, dateTask)
+        await load()
+        switchFilter(selectedFilter)
+        setVisible(false)
+    }
+
+    const setDateTime = (event) => {
+        const currentDate = date(event.nativeEvent.timestamp);
+        setDateTask(currentDate);
         setShow(false)
         // setShow(Platform.OS === 'ios');
     }
@@ -59,14 +67,14 @@ const TaskModal = ({ visible, addTask, setVisible }) => {
                             borderRightWidth: 1,
                             borderColor: color1
                         }}
-                    >{dateTask.toLocaleDateString()}</Text>
+                    >{date.toLocaleDateString()}</Text>
                     <Text
                         style={{
                             width: '50%',
                             padding: 10,
                             textAlign: 'center'
                         }}
-                    >{dateTask.toLocaleTimeString().substr(0, 5)}</Text>
+                    >{date.toLocaleTimeString().substr(0, 5)}</Text>
                 </TouchableOpacity>
                 {
                     show &&
@@ -84,7 +92,7 @@ const TaskModal = ({ visible, addTask, setVisible }) => {
                     buttonStyle={{ borderColor: color1 }}
                     titleStyle={{ color: color1 }}
                     containerStyle={{ position: 'absolute', bottom: 20, width: '100%', }}
-                    onPress={() => addTask(inputTask, dateTask)}
+                    onPress={() => addProcess()}
                 />
             </View>
         </Overlay>

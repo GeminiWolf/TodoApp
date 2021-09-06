@@ -3,11 +3,10 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, Divider } from 'react-native-elements';
 import { User, Object, Query } from "parse/react-native.js";
 import { AuthContext } from '../Providers/AuthProvider';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import localStorage from 'react-native-sync-localstorage';
 import { guidGenerator } from '../Utils/KeyGen';
 import { color1, color2 } from '../Styles/StyleValues';
 
-AsyncStorage
 
 const AddNoteScreen = ({ navigation, route }) => {
 
@@ -15,7 +14,7 @@ const AddNoteScreen = ({ navigation, route }) => {
     const [note, setNote] = useState('')
     const [updateNote, setUpdateNote] = useState(false)
 
-    const { notes, fetchNotes, loadItems } = useContext(AuthContext)
+    const { notes, fetchNotes, load } = useContext(AuthContext)
 
     useEffect(() => {
         if (route.params.use == 'edit') {
@@ -33,10 +32,10 @@ const AddNoteScreen = ({ navigation, route }) => {
             const newNote = { id: genId, title: title, note: note, createdAt: Date.now() };
 
             try {
-                const getItemAdd = await AsyncStorage.getItem('Notes');
+                const getItemAdd = await localStorage.getItem('Notes');
                 const storedItems = await JSON.parse(getItemAdd);
                 const itemsArray = storedItems || [];
-                await AsyncStorage.setItem(
+                await localStorage.setItem(
                     'Notes',
                     JSON.stringify([...itemsArray, newNote])
                 ).catch((err) => {
@@ -47,7 +46,7 @@ const AddNoteScreen = ({ navigation, route }) => {
                 console.log(err);
             }
 
-            loadItems()
+            load()
             navigation.goBack()
         }
         else {
@@ -59,7 +58,7 @@ const AddNoteScreen = ({ navigation, route }) => {
         const idPassed = route.params.note.id;
 
         try {            
-            const getItems = await AsyncStorage.getItem('Notes')
+            const getItems = await localStorage.getItem('Notes')
             const storedItems = await JSON.parse(getItems);
             const itemsArray = storedItems || [];
             
@@ -68,14 +67,14 @@ const AddNoteScreen = ({ navigation, route }) => {
             itemsArray[el].title = title 
             itemsArray[el].note = note 
 
-            await AsyncStorage.setItem(
+            await localStorage.setItem(
                 'Notes',
                 JSON.stringify([...itemsArray])
             ).catch((err) => {
                 console.log(err);
             });
 
-            loadItems()
+            load()
         }
         catch (err) {
             console.log('Err ', err)

@@ -1,34 +1,34 @@
 import React, { useContext, useState } from 'react';
-import { Dimensions, FlatList, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, StatusBar, Text, View } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { AuthContext } from '../Providers/AuthProvider';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import localStorage from 'react-native-sync-localstorage';
 import { color1, color2 } from '../Styles/StyleValues';
-import { getDate } from '../Components/Dates';
+import { getDate } from '../Utils/Dates';
 
 const sw = Dimensions.get('window').width
 
 const NotesScreen = ({ navigation }) => {
     const [filter, setFilter] = useState('')
 
-    const { notes, loadItems } = useContext(AuthContext)
+    const { notes, load } = useContext(AuthContext)
 
     const deleteNote = async (i) => {
         try {
-            const getItemDel = await AsyncStorage.getItem('Notes')
+            const getItemDel = await localStorage.getItem('Notes')
             const storedItems = await JSON.parse(getItemDel);
             const itemsArray = storedItems || [];
 
             itemsArray.splice(i, 1)
 
-            await AsyncStorage.setItem(
+            await localStorage.setItem(
                 'Notes',
                 JSON.stringify([...itemsArray])
             ).catch((err) => {
                 console.log(err);
             });
 
-            loadItems()
+            await load()
         }
         catch (err) {
             alert(err)

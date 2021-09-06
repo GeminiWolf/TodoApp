@@ -1,12 +1,14 @@
 import React from 'react';
-import { Dimensions, Modal, View } from 'react-native';
+import { TouchableOpacity } from 'react-native';
+import { Button, Dimensions, Modal, View } from 'react-native';
 
-const BottomSheet = () => {
+const BottomSheet = ({visible, setVisible}) => {
     return (
         <Modal
-                visible={true}
+                visible={visible}
                 transparent={true}
-                animationType='fade'
+                animationType='slide'
+
             >
                 <View
                     style={{
@@ -23,7 +25,7 @@ const BottomSheet = () => {
                             width: Dimensions.get('window').width,
                         }}
                     >
-                        <View
+                        <TouchableOpacity
                             style={{
                                 backgroundColor: '#adadad',
                                 alignSelf: 'center',
@@ -32,7 +34,9 @@ const BottomSheet = () => {
                                 height: 5,
                                 borderRadius: 5
                             }}
-                        ></View>
+                            onPress={() => setVisible(false)}
+                            
+                        ></TouchableOpacity>
                     </View>
                 </View>
             </Modal>
