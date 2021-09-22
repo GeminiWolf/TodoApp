@@ -1,4 +1,7 @@
 {
   "name": "WolfTodos",
-  "displayName": "WolfTodos"
+  "displayName": "WolfTodos",
+  "expo": {
+    "userInterfaceStyle": "automatic"
+  }
 }

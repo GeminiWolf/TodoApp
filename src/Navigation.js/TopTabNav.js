@@ -10,7 +10,7 @@ const TopTabNav = () => {
 
     return (
         <TopTab.Navigator
-            tabBarOptions={{
+            screenOptions={{
                 // tabStyle: {
                 //     backgroundColor: color2
                 // },

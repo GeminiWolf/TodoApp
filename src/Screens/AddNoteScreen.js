@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Dimensions, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, Divider } from 'react-native-elements';
 import { User, Object, Query } from "parse/react-native.js";
 import { AuthContext } from '../Providers/AuthProvider';
-import localStorage from 'react-native-sync-localstorage';
+import AsyncStorage  from '@react-native-async-storage/async-storage';
 import { guidGenerator } from '../Utils/KeyGen';
-import { color1, color2 } from '../Styles/StyleValues';
+import { color1, color2, color3, color4 } from '../Styles/StyleValues';
 
+const screenWidth = Dimensions.get('window').width;
 
 const AddNoteScreen = ({ navigation, route }) => {
 
@@ -32,10 +33,10 @@ const AddNoteScreen = ({ navigation, route }) => {
             const newNote = { id: genId, title: title, note: note, createdAt: Date.now() };
 
             try {
-                const getItemAdd = await localStorage.getItem('Notes');
+                const getItemAdd = await AsyncStorage.getItem('Notes');
                 const storedItems = await JSON.parse(getItemAdd);
                 const itemsArray = storedItems || [];
-                await localStorage.setItem(
+                await AsyncStorage.setItem(
                     'Notes',
                     JSON.stringify([...itemsArray, newNote])
                 ).catch((err) => {
@@ -58,7 +59,7 @@ const AddNoteScreen = ({ navigation, route }) => {
         const idPassed = route.params.note.id;
 
         try {            
-            const getItems = await localStorage.getItem('Notes')
+            const getItems = await AsyncStorage.getItem('Notes')
             const storedItems = await JSON.parse(getItems);
             const itemsArray = storedItems || [];
             
@@ -67,7 +68,7 @@ const AddNoteScreen = ({ navigation, route }) => {
             itemsArray[el].title = title 
             itemsArray[el].note = note 
 
-            await localStorage.setItem(
+            await AsyncStorage.setItem(
                 'Notes',
                 JSON.stringify([...itemsArray])
             ).catch((err) => {
@@ -84,7 +85,7 @@ const AddNoteScreen = ({ navigation, route }) => {
     }
 
     return (
-        <View style={{ flex: 1, margin: 20, }}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : "height"} style={{ flex: 1, margin: 20, }}>
             <Text style={styles.textTitles}>Title</Text>
             <Divider />
             <TextInput
@@ -106,11 +107,31 @@ const AddNoteScreen = ({ navigation, route }) => {
             />
             {
                 updateNote ?
-                    <Button onPress={() => update()} title='Update' type='outline' />
+                    <Button 
+                        onPress={() => update()} 
+                        title='Update' 
+                        type='outline' 
+                        buttonStyle={{ 
+                            borderColor: '#000', 
+                            height: 50, 
+                            backgroundColor: color3,
+                            borderRadius: 30, 
+                        }} 
+                        titleStyle={{ color: color4 }} />
                     :
-                    <Button onPress={() => add()} title='Add' type='outline' buttonStyle={{ borderColor: '#000' }} titleStyle={{ color: '#000' }} />
+                    <Button 
+                        onPress={() => add()} 
+                        title='Add' 
+                        type='outline' 
+                        buttonStyle={{ 
+                            borderColor: '#000', 
+                            height: 50, 
+                            backgroundColor: color3,
+                            borderRadius: 30, 
+                        }} 
+                        titleStyle={{ color: color4 }} />
             }
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 

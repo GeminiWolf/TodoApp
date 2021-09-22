@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import MainStackNav from './src/Navigation.js/MainStackNav';
-import { Platform } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 
 import Parse from "parse/react-native.js";
 import { NavigationContainer } from '@react-navigation/native';
 import AuthProvider from './src/Providers/AuthProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { applicationId, javascriptKey, serverURL } from './constants/keys';
+import { color3 } from './src/Styles/StyleValues';
 
 // Parse.setAsyncStorage(AsyncStorage);
 // Parse.initialize(applicationId, javascriptKey);
@@ -29,6 +30,7 @@ const App = () => {
 
   return (
     <AuthProvider>
+      <StatusBar backgroundColor={color3} barStyle='light-content' />
       <NavigationContainer>
         <MainStackNav />
       </NavigationContainer>

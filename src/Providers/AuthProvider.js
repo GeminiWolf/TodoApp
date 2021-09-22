@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { User } from "parse/react-native.js";
-import localStorage from 'react-native-sync-localstorage';
+import AsyncStorage  from '@react-native-async-storage/async-storage';
 
 export const AuthContext = createContext()
 
@@ -8,8 +8,8 @@ const AuthProvider = ({ children }) => {
 
     const [user, setUser] = useState(null)
     const [Error, setError] = useState(null)
-    const [tasks, setTasks] = useState(null)
-    const [notes, setNotes] = useState(null)
+    const [tasks, setTasks] = useState([])
+    const [notes, setNotes] = useState([])
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(false)
     const [loadingBtn, setLoadingBtn] = useState(false)
@@ -17,21 +17,20 @@ const AuthProvider = ({ children }) => {
     
     const loadItems = () => {
         load()
-        
         setLoading(false)
     }
 
     const load = async () => {
         try{
-            const getTasks = await localStorage.getItem('Tasks')            
+            const getTasks = await AsyncStorage .getItem('Tasks')            
             const parsedTasks = getTasks != null ? await JSON.parse(getTasks) : []
             setTasks(parsedTasks)
             
-            const getNotes = await localStorage.getItem('Notes')
+            const getNotes = await AsyncStorage .getItem('Notes')
             const parsedNotes = getNotes != null ? await JSON.parse(getNotes) : []
             setNotes(parsedNotes)
 
-            const getCat = await localStorage.getItem('Categories')
+            const getCat = await AsyncStorage .getItem('Categories')
             const parsedCat = getNotes != null ? await JSON.parse(getCat) : []
             setCategories(parsedCat)
 

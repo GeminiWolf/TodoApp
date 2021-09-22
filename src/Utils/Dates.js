@@ -1,29 +1,33 @@
 import moment from 'moment'
 
-function getDate(d){
-    
+function getDate(d){    
     const date = d || new Date()
-
-
-    return moment(d).format('ddd, D MMM YYYY')
+    return moment(date).format('dddd, D MMM YYYY')
 }
 
 const getWeek = (d) => {
     const date = d || new Date()
-
-    return moment(d).week()
+    return moment(date).week()
 }
 
 const getMonth = (d) => {
     const date = d || new Date()
-
-    return moment(d).month()
+    return moment(date).month()
 }
 
 const getYear = (d) => {
     const date = d || new Date()
-
-    return moment(d).year()
+    return moment(date).year()
 }
 
-export {getDate, getWeek, getMonth, getYear};
+const setDateFormat = (d) => {
+    const date = d || new Date()
+    return moment(date).format('dddd, D MMM YYYY')
+}
+
+const setTimeFormat = (d) => {
+    const date = d || new Date()
+    return moment(date).format('HH:mm')
+}
+
+export {getDate, getWeek, getMonth, getYear, setDateFormat, setTimeFormat, moment};

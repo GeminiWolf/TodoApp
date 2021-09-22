@@ -1,58 +1,63 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { FlatList, StatusBar, Text, View, StyleSheet } from 'react-native';
-import { Icon } from 'react-native-elements';
-import {Swipeable} from 'react-native-gesture-handler';
+import React, { useContext, useState, useEffect, useRef } from 'react';
+import { FlatList, StatusBar, Text, View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import * as Icon from 'react-native-feather';
 import { getWeek } from '../Utils/Dates';
 import TaskModal from '../Components/TaskModal';
 import { AuthContext } from '../Providers/AuthProvider';
-import { color1, color2 } from '../Styles/StyleValues';
+import { color3, color4 } from '../Styles/StyleValues';
 import {getDate, getMonth, getYear} from '../Utils/Dates';
-import BottomSheet from '../Components/BottomSheet';
 import { complete, deleteTodo, incomplete } from '../Utils/TaskActions';
+import TaskCards from '../Components/TaskCards';
 
-const TodoScreen = () => {
+const screenWidth = Dimensions.get('window').width;
+
+const TodoScreen = ({navigation}) => {
+    const { tasks, categories, load } = useContext(AuthContext)
+
     const [visible, setVisible] = useState(false)
     const [selectedFilter, setSelectedFilter] = useState('today')
-    
-    const { tasks, categories, load } = useContext(AuthContext)
     
     const [loadedTasks, setLoadedTasks] = useState([])
 
     useEffect(() => {
-        if(tasks && tasks !== undefined){
-            switchFilter(selectedFilter)
-        }
-    }, [tasks])
+        return () => switchFilter(selectedFilter)
+    }, [load])
 
-    const switchFilter = (e) => {
+    const switchFilter = async (e) => {
+        const temp = await tasks.sort((a, b) => a.startDate - b.startDate);
+
+        setSelectedFilter(e)
+
         switch (e) {
-            case 'today':
-                setSelectedFilter(e)
-                setLoadedTasks(
-                    tasks.filter(t => getDate(t.completionDate) == getDate())
-                )                
+            case 'today': 
+                    setLoadedTasks(temp.filter(t => getDate(t.startDate) === getDate()))
+                    // await filtSelector[e]
                 break;
-            case 'week':
-                setSelectedFilter(e)
-                setLoadedTasks(
-                    tasks.filter(t => getYear(t.completionDate) == getYear() && getWeek(t.completionDate) == getWeek() )
-                )                
+            case 'week':  
+                    setLoadedTasks(temp.filter(t => getYear(t.startDate) === getYear() && getWeek(t.startDate) === getWeek()))
+                    // await filtSelector[e]
                 break;
-            case 'month':
-                setSelectedFilter(e)
-                setLoadedTasks(
-                    tasks.filter(t => getYear(t.completionDate) == getYear() && getMonth(t.completionDate) == getMonth())
-                )                
+            case 'month': 
+                    setLoadedTasks(temp.filter(t => getYear(t.startDate) === getYear() && getMonth(t.startDate) === getMonth()))
+                    // await filtSelector[e]
                 break;
-            case 'all':
-                setSelectedFilter(e)
-                setLoadedTasks(tasks)
+            case 'all': setLoadedTasks(temp)
+                    // await filtSelector[e]
                 break;
+        
             default:
                 break;
         }
+
+        // const filtSelector = {
+        //     ,
+        //     ,
+        //     ,
+        //     ,
+        // }
+        
     }
-    
+
     const selectProcess = async (opt, i) => {
         switch (opt) {
             case 'delete':
@@ -64,12 +69,11 @@ const TodoScreen = () => {
             case 'incomplete':
                 await incomplete(i);
                 break;
-        
             default:
                 break;
         }
         load()
-        switchFilter(selectedFilter)
+        await switchFilter(selectedFilter)
     }
     
     const rightSwipe = (item, index) => {
@@ -77,6 +81,7 @@ const TodoScreen = () => {
             <View style={{
                 justifyContent: 'space-around',
                 alignItems: 'center',
+                alignSelf: 'center', 
                 flexDirection: 'row',
                 width: 90,
                 height: 60,
@@ -93,7 +98,7 @@ const TodoScreen = () => {
                         backgroundColor: 'red',
                         width: 60*0.6,
                         height: '60%',
-                        borderRadius: 30,
+                        borderRadius: 50,
                     }} 
                 />
                 <Icon 
@@ -123,6 +128,7 @@ const TodoScreen = () => {
     const leftSwipe = (item, index) => {
         return(
             <View style={{
+                alignSelf: 'center',
                 justifyContent: 'center',
                 alignItems: 'center',
                 height: 60,
@@ -146,63 +152,67 @@ const TodoScreen = () => {
     }
 
     return (
-        <View style={{ flex: 1, paddingHorizontal: 20 }} >
+        <View style={{ flex: 1, alignItems: 'center' }} >
             <StatusBar barStyle='dark-content' />
             <View 
                 style={styles.filter}>
                 <Text 
                     style={[
                         styles.filterTitle, 
-                        selectedFilter == 'today' && {backgroundColor: '#fff'}]}
+                        selectedFilter === 'today' && {backgroundColor: color3}]}
                         onPress={() => switchFilter('today')}
                 >Today</Text>
                 <Text 
                     style={[
                         styles.filterTitle, 
-                        selectedFilter == 'week' && {backgroundColor: '#fff'}]}
+                        selectedFilter === 'week' && {backgroundColor: color3}]}
                         onPress={() => switchFilter('week')}
                 >Week</Text>
                 <Text 
                     style={[
                         styles.filterTitle, 
-                        selectedFilter == 'month' && {backgroundColor: '#fff'}]}
+                        selectedFilter === 'month' && {backgroundColor: color3}]}
                         onPress={() => switchFilter('month')}
                 >Month</Text>
                 <Text 
                     style={[
                         styles.filterTitle, 
-                        selectedFilter == 'all' && {backgroundColor: '#fff'}]}
+                        selectedFilter === 'all' && {backgroundColor: color3}]}
                         onPress={() => switchFilter('all')}
                 >All</Text>
             </View>
-            <Text style={{ fontSize: 30, marginTop: 10, color: '#000' }}>Tasks</Text>
-            <Text style={{ marginBottom: 20, color: '#000' }}>{getDate()}</Text>
-            {console.log(loadedTasks)}
+            <Text style={{ width: (screenWidth-40), fontSize: 30, marginTop: 10, color: '#000' }}>Tasks</Text>
+            <Text style={{ width: (screenWidth-40), marginBottom: 20, color: '#000' }}>{getDate()}</Text>
             <FlatList
                 data={loadedTasks}
                 showsVerticalScrollIndicator={false}
                 keyExtractor={task => task.id}
-                renderItem={({ item, index }) => (
-                    <Swipeable renderLeftActions={leftSwipe} renderRightActions={rightSwipe} >
-                        <View style={{ backgroundColor: color2, borderWidth: 0, height: 60, width: '100%', marginBottom: 20, flexDirection: 'row', alignItems: 'center', borderRadius: 10 }}>
-                            <View>
-                                <Text style={{ fontSize: 18 }}>{item.task}</Text>
-                                <Text style={{ fontSize: 12 }}>{getDate(item.completionDate)}</Text>
-                            </View>
-                        </View>
-                    </Swipeable>
-                )}
+                style={{width: '100%'}}
+                renderItem={({item, index}) => <TaskCards item={item} index={index} load={load} tasks={tasks}/>}
             />
-            <Icon containerStyle={{ paddingBottom: 20 }} onPress={() => setVisible(true)} name='add' type='ionicons' size={50} />
-            {/* <BottomSheet visible={visible} setVisible={setVisible} /> */}
-            <TaskModal visible={visible} setVisible={setVisible} load={load} switchFilter={switchFilter} selectedFilter={selectedFilter} />
+            <View style={{ paddingBottom: 20, width: '100%', alignItems: 'flex-end', right: 20, bottom: 10 }} >
+                <Icon.PlusCircle 
+                    stroke='#000' 
+                    strokeWidth={1} 
+                    onPress={() => navigation.navigate('New Task')} 
+                    width={60} 
+                    height={60} 
+                />
+            </View>
+            <TaskModal 
+                visible={visible} 
+                setVisible={setVisible} 
+                load={load} 
+                switchFilter={switchFilter} 
+                selectedFilter={selectedFilter} 
+            />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     filter: {
-        width: '100%', 
+        width: (screenWidth-40), 
         backgroundColor: 'grey', 
         flexDirection: 'row', 
         borderRadius: 15, 
@@ -211,6 +221,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around' ,
         marginTop: 10,
         overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOpacity: 0.6,
+        shadowOffset: {
+            width: 2,
+            height: 10,
+        }
     },
     filterTitle: { 
         fontSize: 18, 
@@ -218,10 +234,12 @@ const styles = StyleSheet.create({
         textAlign: 'center', 
         textAlignVertical: 'center', 
         height: '100%', 
+        color: color4,
     },
     filsterStylesSelected: {
         backgroundColor: '#fff',
-    }
+    },
+    
 })
 
 export default TodoScreen;

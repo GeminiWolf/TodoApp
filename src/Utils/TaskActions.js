@@ -1,14 +1,13 @@
-import localStorage from 'react-native-sync-localstorage';
+import AsyncStorage  from '@react-native-async-storage/async-storage';
 import { guidGenerator } from '../Utils/KeyGen';
 
 exports.deleteTodo = async (i) => {
     try {
-        const storedItems = JSON.parse(await localStorage.getItem('Tasks'));
+        const storedItems = JSON.parse(await AsyncStorage.getItem('Tasks'));
         const itemsArray = storedItems || [];
-
-        itemsArray.splice(i, 1)
-
-        await localStorage.setItem(
+        itemsArray.splice( i, 1)
+        
+        await AsyncStorage.setItem(
             'Tasks',
             JSON.stringify([...itemsArray])
         ).catch((err) => {
@@ -20,15 +19,15 @@ exports.deleteTodo = async (i) => {
     }
 }
 
-exports.addTask = async (newEntry, newDate) => {
+exports.addTask = async (title, description, newDate, endDate) => {
     let genId = guidGenerator();
-    if (newEntry !== '') {
-        const newTask = { id: genId, task: newEntry, completionDate: newDate, dateCreated: Date.now(), category: 'none', completed: false }
+    if (title !== '') {
+        const newTask = { id: genId, title: title, description: description, startDate: newDate, endDate: endDate, dateCreated: Date.now(), category: 'none', completed: false }
 
         try {
-            const storedItems = JSON.parse(await localStorage.getItem('Tasks'));
+            const storedItems = JSON.parse(await AsyncStorage.getItem('Tasks'));
             const itemsArray = storedItems || [];
-            await localStorage.setItem(
+            await AsyncStorage.setItem(
                 'Tasks',
                 JSON.stringify([...itemsArray, newTask])
             ).catch((err) => {
@@ -44,19 +43,19 @@ exports.addTask = async (newEntry, newDate) => {
     }
 }
 
-exports.addCategory = async (newEntry, color) => {
+exports.addCategory = async (descrption, color) => {
     let genId = guidGenerator();
     let c = 
-    newEntry = newEntry.charAt(0).toUpperCase() + newEntry.slice(1)
+    descrption = descrption.charAt(0).toUpperCase() + descrption.slice(1)
 
-    if (newEntry !== '') {
-        const newCategory = { id: genId, category: newEntry, color: color}
+    if (descrption !== '') {
+        const newCategory = { id: genId, category: descrption, color: color}
 
-        if(itemsArray.indexOf(newEntry) == -1){
+        if(itemsArray.indexOf(descrption) == -1){
             try {
-                const storedItems = JSON.parse(await localStorage.getItem('Tasks'));
+                const storedItems = JSON.parse(await AsyncStorage.getItem('Tasks'));
                 const itemsArray = storedItems || [];
-                await localStorage.setItem(
+                await AsyncStorage.setItem(
                     'Tasks',
                     JSON.stringify([...itemsArray, newCategory])
                 ).catch((err) => {
@@ -68,7 +67,7 @@ exports.addCategory = async (newEntry, color) => {
             }
         }
         else{
-            alert(newEntry, 'already exsists.')
+            alert(descrption, 'already exsists.')
         }
     }
     else {
@@ -78,12 +77,12 @@ exports.addCategory = async (newEntry, color) => {
 
 exports.complete = async (i) => {
     try {
-        const storedItems = JSON.parse(await localStorage.getItem('Tasks'));
+        const storedItems = JSON.parse(await AsyncStorage.getItem('Tasks'));
         const itemsArray = storedItems || [];
 
         itemsArray[i].completed = true
 
-        await localStorage.setItem(
+        await AsyncStorage.setItem(
             'Tasks',
             JSON.stringify([...itemsArray])
         ).catch((err) => {
@@ -98,12 +97,12 @@ exports.complete = async (i) => {
 exports.incomplete = async (i) => {
 
     try {
-        const storedItems = JSON.parse(await localStorage.getItem('Tasks'));
+        const storedItems = JSON.parse(await AsyncStorage.getItem('Tasks'));
         const itemsArray = storedItems || [];
 
         itemsArray[i].completed = false
 
-        await localStorage.setItem(
+        await AsyncStorage.setItem(
             'Tasks',
             JSON.stringify([...itemsArray])
         ).catch((err) => {
